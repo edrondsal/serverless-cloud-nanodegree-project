@@ -1,18 +1,21 @@
 import {TodoItem} from '../models/TodoItem'
 import {TodoUpdate} from '../models/TodoUpdate'
 import * as AWS from 'aws-sdk'
+import * as AWSXRay from 'aws-xray-sdk'
+
+const XAWS = AWSXRay.captureAWS(AWS)
 
 
 function createDynamoDbDocumentClient():AWS.DynamoDB.DocumentClient{
     if(process.env.IS_OFFLINE){
         console.log('Creating DocumentClient for Offline test')
-        return new AWS.DynamoDB.DocumentClient({
+        return new XAWS.DynamoDB.DocumentClient({
             region: 'localhost',
             endpoint: `http://localhost:${process.env.DYNAMODB_OFFLINE_PORT}/`
         })
     }
 
-    return new AWS.DynamoDB.DocumentClient()
+    return new XAWS.DynamoDB.DocumentClient()
 }
 
 export class TodoAccess {
